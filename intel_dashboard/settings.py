@@ -72,3 +72,5 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ],
 }
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
