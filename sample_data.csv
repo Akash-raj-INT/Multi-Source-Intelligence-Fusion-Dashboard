@@ -1,0 +1,11 @@
+title,description,lat,long,source_type
+Cairo Signals Hub,Intercept station picking up unusual radio traffic near the Nile delta.,30.0444,31.2357,OSINT
+Moscow Airfield Activity,Satellite imagery shows increased aircraft movement at northern airfield.,55.7558,37.6173,IMINT
+Karachi Port Watch,Human intelligence report of clandestine cargo transfer at night.,24.8607,67.0011,HUMINT
+Singapore Data Centre,Open-source report of suspected server farm linked to state actor.,1.3521,103.8198,OSINT
+Nairobi Field Report,Asset confirms movement of persons of interest through Westlands district.,1.2921,36.8219,HUMINT
+Sydney Harbour Observation,Aerial imagery captures unregistered vessel docked at restricted quay.,-33.8688,151.2093,IMINT
+Berlin Digital Footprint,Social media analysis links alias accounts to known threat group.,52.5200,13.4050,OSINT
+São Paulo Infrastructure,Human source reports unusual activity near telecommunications tower.,-23.5505,-46.6333,HUMINT
+Mumbai Coastal Anomaly,Satellite pass detects small craft convoy outside shipping lanes.,19.0760,72.8777,IMINT
+Toronto Open Source Alert,Dark-web forum post references planned disruption in financial district.,43.6532,-79.3832,OSINT

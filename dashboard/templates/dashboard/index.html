@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MSIF — Multi-Source Intelligence Fusion</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Google Fonts: Share Tech Mono + Barlow Condensed -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'dashboard/css/style.css' %}" />
+</head>
+<body>
+
+  <!-- Scanline overlay -->
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <!-- ── HEADER ── -->
+  <header class="site-header">
+    <div class="header-left">
+      <span class="header-badge">CLASSIFIED</span>
+      <h1 class="site-title">MSIF <span>//</span> Multi-Source Intelligence Fusion</h1>
+    </div>
+    <div class="header-right">
+      <span class="live-clock" id="liveClock">--:--:-- UTC</span>
+      <span class="status-dot" id="statusDot"></span>
+      <span class="status-label" id="statusLabel">INITIALIZING</span>
+    </div>
+  </header>
+
+  <!-- ── MAIN LAYOUT ── -->
+  <main class="layout">
+
+    <!-- ── LEFT PANEL ── -->
+    <aside class="panel panel-left">
+
+      <!-- Stats -->
+      <section class="panel-section">
+        <h2 class="section-title">// SIGNAL OVERVIEW</h2>
+        <div class="stat-grid">
+          <div class="stat-card osint">
+            <span class="stat-label">OSINT</span>
+            <span class="stat-value" id="countOSINT">0</span>
+          </div>
+          <div class="stat-card humint">
+            <span class="stat-label">HUMINT</span>
+            <span class="stat-value" id="countHUMINT">0</span>
+          </div>
+          <div class="stat-card imint">
+            <span class="stat-label">IMINT</span>
+            <span class="stat-value" id="countIMINT">0</span>
+          </div>
+          <div class="stat-card total">
+            <span class="stat-label">TOTAL</span>
+            <span class="stat-value" id="countTotal">0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filter -->
+      <section class="panel-section">
+        <h2 class="section-title">// FILTER LAYER</h2>
+        <div class="filter-group">
+          <label class="filter-chip osint-chip">
+            <input type="checkbox" value="OSINT" checked /> OSINT
+          </label>
+          <label class="filter-chip humint-chip">
+            <input type="checkbox" value="HUMINT" checked /> HUMINT
+          </label>
+          <label class="filter-chip imint-chip">
+            <input type="checkbox" value="IMINT" checked /> IMINT
+          </label>
+        </div>
+      </section>
+
+      <!-- Add Point Form -->
+      <section class="panel-section">
+        <h2 class="section-title">// ADD INTEL POINT</h2>
+        <div class="form-body">
+          <input class="field" type="text" id="fTitle" placeholder="Title *" />
+          <textarea class="field" id="fDesc" placeholder="Description" rows="2"></textarea>
+          <div class="field-row">
+            <input class="field" type="number" id="fLat" placeholder="Latitude *" step="any" />
+            <input class="field" type="number" id="fLng" placeholder="Longitude *" step="any" />
+          </div>
+          <select class="field" id="fSource">
+            <option value="OSINT">OSINT</option>
+            <option value="HUMINT">HUMINT</option>
+            <option value="IMINT">IMINT</option>
+          </select>
+          <label class="upload-label" id="imageUploadLabel">
+            <span id="imageFileName">[ ATTACH IMAGE — OPTIONAL ]</span>
+            <input type="file" id="fImage" accept="image/*" style="display:none" />
+          </label>
+          <button class="btn btn-primary" id="btnAddPoint">⊕ SUBMIT INTEL</button>
+        </div>
+      </section>
+
+      <!-- CSV Upload -->
+      <section class="panel-section">
+        <h2 class="section-title">// BULK CSV UPLOAD</h2>
+        <div
+          class="drop-zone"
+          id="dropZone"
+          ondragover="event.preventDefault(); this.classList.add('drag-over')"
+          ondragleave="this.classList.remove('drag-over')"
+          ondrop="handleDrop(event)"
+        >
+          <span class="drop-icon">⬆</span>
+          <p>Drag &amp; drop CSV here<br /><small>or click to browse</small></p>
+          <input type="file" id="csvFile" accept=".csv" style="display:none" />
+        </div>
+        <p class="csv-hint">Columns: <code>title, description, lat, long, source_type</code></p>
+        <div id="csvFeedback" class="csv-feedback"></div>
+      </section>
+
+    </aside>
+
+    <!-- ── MAP ── -->
+    <div class="map-container">
+      <div id="map"></div>
+      <div class="map-overlay-controls">
+        <button class="map-btn" id="btnRefresh" title="Refresh markers">↺ REFRESH</button>
+        <button class="map-btn" id="btnClearFilters" title="Reset all filters">⊘ CLEAR</button>
+      </div>
+      <div class="map-legend">
+        <span class="legend-dot osint-dot"></span>OSINT
+        <span class="legend-dot humint-dot"></span>HUMINT
+        <span class="legend-dot imint-dot"></span>IMINT
+      </div>
+    </div>
+
+    <!-- ── RIGHT PANEL ── -->
+    <aside class="panel panel-right">
+      <section class="panel-section">
+        <h2 class="section-title">// RECENT INTEL LOG</h2>
+        <ul class="intel-log" id="intelLog">
+          <li class="log-empty">Awaiting data feed…</li>
+        </ul>
+      </section>
+
+      <section class="panel-section">
+        <h2 class="section-title">// SELECTED POINT</h2>
+        <div class="detail-pane" id="detailPane">
+          <p class="detail-empty">Click a map marker to inspect.</p>
+        </div>
+      </section>
+    </aside>
+
+  </main>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  {% load static %}
+  <script src="{% static 'dashboard/js/app.js' %}"></script>
+</body>
+</html>
