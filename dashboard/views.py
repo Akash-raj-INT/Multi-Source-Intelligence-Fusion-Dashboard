@@ -3,6 +3,7 @@ import io
 
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
@@ -13,6 +14,7 @@ from .models import IntelligencePoint
 from .serializers import IntelligencePointSerializer
 
 
+@ensure_csrf_cookie
 def index(request):
     """Serve the main dashboard HTML page."""
     return render(request, 'dashboard/index.html')
