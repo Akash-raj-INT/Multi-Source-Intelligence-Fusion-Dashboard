@@ -72,5 +72,10 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ],
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://multi-source-intelligence-fusion-dwp6.onrender.com"
+]
+
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
