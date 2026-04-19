@@ -12,11 +12,16 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-intel-dashboard-local-dev-
 
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '')
 if ALLOWED_HOSTS:
     ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS.split(',') if host.strip()]
 else:
     ALLOWED_HOSTS = ['*']
+
+# Auto-add Render hostname if available
+_render_host = os.getenv('RENDER_EXTERNAL_HOSTNAME')
+if _render_host and _render_host not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(_render_host)
 
 INSTALLED_APPS = [
     'django.contrib.auth',
@@ -84,8 +89,7 @@ if _csrf_origins:
 else:
     CSRF_TRUSTED_ORIGINS = []
 
-# Auto-add RENDER_EXTERNAL_HOSTNAME if running on Render
-_render_host = os.getenv('RENDER_EXTERNAL_HOSTNAME')
+# Auto-add RENDER_EXTERNAL_HOSTNAME to CSRF_TRUSTED_ORIGINS if running on Render
 if _render_host:
     CSRF_TRUSTED_ORIGINS.append(f'https://{_render_host}')
 
