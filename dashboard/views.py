@@ -20,6 +20,7 @@ def index(request):
     return render(request, 'dashboard/index.html')
 
 
+@csrf_exempt
 @api_view(['GET', 'POST'])
 @parser_classes([MultiPartParser, FormParser, JSONParser])
 def intelligence_points(request):
